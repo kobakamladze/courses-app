@@ -1,0 +1,21 @@
+{
+  "name": "node-express",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "server": "cd server && npm run watch",
+    "watch": "concurrently \"npm run server\"",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express-handlebars": "^6.0.6"
+  },
+  "devDependencies": {
+    "concurrently": "^7.5.0"
+  }
+}
