@@ -6,8 +6,10 @@
   "scripts": {
     "start": "node index.js",
     "server": "cd server && npm run watch",
+    "installServerPackages": "cd server && npm install",
     "watch": "concurrently \"npm run server\"",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "installPackages": "concurrently \"npm i\" \"npm run installServerPackages\""
   },
   "keywords": [],
   "author": "",
