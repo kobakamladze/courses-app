@@ -15,10 +15,6 @@ coursesRouter.get("/", (req, res) =>
 coursesRouter.get("/:courseId", (req, res) => {
   const courseId = +req.params.courseId;
   const courseFoundById = findCourseById(courseId);
-
-  console.log(JSON.stringify(req.params));
-  console.log(JSON.stringify(courseFoundById));
-
   const { img, title, price } = courseFoundById;
 
   res.render("course", { img, title, price });
@@ -33,27 +29,31 @@ coursesRouter.get("/:courseId/edit", (req, res) => {
   const courseFoundById = findCourseById(courseId);
   const { id, img, title } = courseFoundById;
 
-  console.log("ID === " + id);
-
   return res.render("courseEdit", { id, img, title });
 });
 
-coursesRouter.put("/:courseId/edit", (req, res) => {
+coursesRouter.post("/:courseId/edit", (req, res) => {
   const courseId = +req.params.courseId;
   const courseFoundById = findCourseById(courseId);
 
-  console.log(JSON.stringify(courseId));
-  console.log(JSON.stringify(courseFoundById));
-  console.log("PARAMS === " + JSON.stringify(req.params));
+  const { price: oldPrice, img: oldImg, title: oldTitle } = courseFoundById;
+  const { price: newPrice, img: newImg, title: newTitle } = req.body;
 
-  const { price: oldPrice, img: oldImg, titel: oldTitle } = courseFoundById;
-  const { price: newPrice, img: newImg, titel: newTitle } = req.body;
+  console.log("COURSE ID === " + courseId);
+  console.log("COURSE === " + JSON.stringify(courseFoundById));
+
+  console.log("NEW TITLE === " + newTitle);
+  console.log("OLD TITLE === " + oldTitle);
+  console.log("NEW PRICE === " + newPrice);
+  console.log("OLD PRICE === " + oldPrice);
+  console.log("NEW IMG === " + newImg);
+  console.log("OLD IMG === " + oldImg);
 
   courseFoundById.price = newPrice ? newPrice : oldPrice;
   courseFoundById.title = newTitle ? newTitle : oldTitle;
   courseFoundById.img = newImg ? newImg : oldImg;
 
-  res.render("courses");
+  res.redirect("/courses");
 });
 
 export { coursesRouter };
