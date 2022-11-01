@@ -7,7 +7,8 @@
     "start": "node index.js",
     "server": "cd server && npm run watch",
     "watch": "concurrently \"npm run server\"",
-    "dev": "nodemon index.js"
+    "installServerPackages": "cd server && npm install",
+    "installPackages": "concurrently \"npm i\" \"npm run installServerPackages\""
   },
   "keywords": [],
   "author": "",
@@ -16,6 +17,7 @@
     "express-handlebars": "^6.0.6"
   },
   "devDependencies": {
-    "concurrently": "^7.5.0"
+    "concurrently": "^7.5.0",
+    "eslint": "^8.26.0"
   }
 }

@@ -1,5 +1,6 @@
-{{#if coursesList.length}}
-  {{#each coursesList}}
+{{#if cartList.length}}
+  {{#each cartList}}
+    <h1>Cart:</h1>
 
     <div class="row">
       <div class="col s6 offset-s3">
@@ -15,16 +16,9 @@
             <p class="price">{{price}}</p>
           </div>
           <div class="card-action">
-            <a href="/courses/{{id}}">Buy course</a>
-            <a href="/courses/{{id}}/edit?allow=true">Edit course</a>
             <form action="cart/add/{{id}}" method="POST">
               <input type="hidden" name="id" value="{{id}}" />
-              <button class="btn btn-primary">Add to cart</button>
-            </form>
-
-            <form action="trash/add/{{id}}" method="POST">
-              <input type="hidden" name="id" value="{{id}}" />
-              <button class="btn btn-primary">Move to trash</button>
+              <button class="btn btn-primary">Remove from cart</button>
             </form>
           </div>
         </div>
@@ -33,5 +27,5 @@
 
   {{/each}}
 {{else}}
-  <h1>No courses yet...</h1>
+  <h1>Cart is empty</h1>
 {{/if}}

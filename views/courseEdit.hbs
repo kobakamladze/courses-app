@@ -1,7 +1,13 @@
-<form action="/add" method="POST">
+<form action="/courses/{{id}}/edit" method="POST">
 
   <div class="input-field col s12">
-    <input id="title" name="title" type="text" class="validate" required />
+    <input
+      id="title"
+      name="title"
+      type="text"
+      class="validate"
+      value="{{title}}"
+    />
     <label for="title">Course name</label>
     <span class="helper-text" data-error="Enter name of course"></span>
   </div>
@@ -12,18 +18,18 @@
       name="price"
       type="number"
       class="validate"
-      required
       min="1"
+      value="{{price}}"
     />
     <label for="price">Price</label>
     <span class="helper-text" data-error="Enter price/number"></span>
   </div>
 
   <div class="input-field col s12">
-    <input id="img" name="image" type="text" class="validate" required />
+    <input id="img" name="image" type="text" class="validate" value="{{img}}" />
     <label for="img">URL of image</label>
     <span class="helper-text" data-error="Enter url of image"></span>
   </div>
 
-  <button class="btn btn-primary">Add Course</button>
+  <button class="btn btn-primary">Save Changes</button>
 </form>
