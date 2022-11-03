@@ -6,8 +6,6 @@ import { getTotalPrice } from "../models/cartModel.js";
 const cartRouter = express.Router();
 
 cartRouter.get("/", (req, res) => {
-  console.log("CART LIST === " + JSON.stringify(cartList));
-
   const totalPrice = getTotalPrice();
   res.render("cart", { cartList, totalPrice });
 });
@@ -17,15 +15,20 @@ cartRouter.post("/add/:courseId", (req, res) => {
   return addToCart(courseId)
     .then(() => res.redirect("/cart"))
     .catch((err) => {
-      if (err) {
-        return res.status(404);
-      }
+      if (err) console.log(err);
+      return res.redirect("/");
     });
 });
 
 cartRouter.post("/remove/:courseId", (req, res) => {
-  const courseId = req.query.courseId;
-  return removeFromCart(courseId).then(() => res.redirect("/cart"));
+  const { courseId } = req.params;
+
+  return removeFromCart(courseId)
+    .then(() => res.redirect("/cart"))
+    .catch((err) => {
+      if (err) console.log(err);
+      return res.render("error", { error: err });
+    });
 });
 
 export { cartRouter };

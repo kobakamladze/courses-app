@@ -1,18 +1,21 @@
-import express from "express";
-import exphbs from "express-handlebars";
+import express from 'express';
+import exphbs from 'express-handlebars';
+import mongoose from 'mongoose';
 
-import { coursesRouter } from "./routes/coursesRouter.js";
-import { addRouter } from "./routes/addRouter.js";
-import { homeRouter } from "./routes/homeRouter.js";
-import { cartRouter } from "./routes/cartRouter.js";
-import { trashBinRouter } from "./routes/trashBinRouter.js";
+import { coursesRouter } from './routes/coursesRouter.js';
+import { addRouter } from './routes/addRouter.js';
+import { homeRouter } from './routes/homeRouter.js';
+import { cartRouter } from './routes/cartRouter.js';
+import { trashBinRouter } from './routes/trashBinRouter.js';
 
-// PORT and server
+// Choosing PORT
 const PORT = process.env.PORT || 3000;
 
+const DB_PASSWORD = process.env.DB_PASSWORD;
+
 const hbs = exphbs.create({
-  defaultLayout: "main",
-  extname: "hbs",
+  defaultLayout: 'main',
+  extname: 'hbs',
 });
 
 const app = express();
@@ -27,15 +30,23 @@ app.use((req, res, next) => {
 });
 
 // View Engine
-app.engine("hbs", hbs.engine);
-app.set("view engine", "hbs");
-app.set("views", "../views");
+app.engine('hbs', hbs.engine);
+app.set('view engine', 'hbs');
+app.set('views', '../views');
 
 // Routes
-app.use("/add", addRouter);
-app.use("/courses", coursesRouter);
-app.use("/cart", cartRouter);
-app.use("/trash", trashBinRouter);
-app.use("/*", homeRouter);
+app.use('/add', addRouter);
+app.use('/courses', coursesRouter);
+app.use('/cart', cartRouter);
+app.use('/trash', trashBinRouter);
+app.use('/*', homeRouter);
 
-app.listen(PORT, () => console.log(`Listening on PORT ${PORT}...`));
+mongoose
+  .connect(
+    `mongodb+srv://koba08:${DB_PASSWORD}@coursesapp.bki86ux.mongodb.net/?retryWrites=true&w=majority`,
+    () => console.log('Connected to DB...')
+  )
+  .then(() =>
+    app.listen(PORT, () => console.log(`Listening on PORT ${PORT}...`))
+  )
+  .catch(err => console.log(err));

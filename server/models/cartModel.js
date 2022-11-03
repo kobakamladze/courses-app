@@ -25,12 +25,8 @@ function addToCart(id) {
 }
 
 function getTotalPrice() {
-  if (!cartList.length) {
-    return Promise.reject();
-  }
-
   const coursesTotalPrice = cartList.reduce(
-    (acc, { price, quantity }) => acc + price * quantity,
+    (acc, { price }) => acc + Number(price),
     0
   );
 

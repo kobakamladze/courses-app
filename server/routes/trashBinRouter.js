@@ -18,26 +18,33 @@ trashBinRouter.post("/add/:courseId", (req, res) => {
   return addToTrash(courseId)
     .then(() => deleteCourse(courseId))
     .then(() => res.redirect("/trash"))
-    .catch((err) => (err ? console.log(err) : false));
+    .catch((err) => {
+      if (err) console.log(err);
+      return res.redirect("/");
+    });
 });
 
 trashBinRouter.post("/delete/:courseId", (req, res) => {
   const courseId = req.query.courseId;
   return deleteFromTrash(courseId)
     .then(() => res.redirect("/"))
-    .catch((err) => (err ? console.log(err) : false));
+    .catch((err) => {
+      if (err) console.log(err);
+      return res.redirect("/");
+    });
 });
 
 trashBinRouter.post("/recover/:courseId", (req, res) => {
   const { courseId } = req.params;
   const { title, img, price } = req.query;
 
-  console.log("Course Id === " + courseId);
-
   return addCourse({ title, img, price, idParam: courseId })
     .then(() => deleteFromTrash(courseId))
     .then(() => res.redirect("/courses"))
-    .catch((err) => (err ? console.log(err) : false));
+    .catch((err) => {
+      if (err) console.log(err);
+      return res.redirect("/");
+    });
 });
 
 export { trashBinRouter };
