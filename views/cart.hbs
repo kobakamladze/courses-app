@@ -1,31 +1,39 @@
 {{#if cartList.length}}
-  {{#each cartList}}
-    <h1>Cart:</h1>
+  <h1>Cart:</h1>
 
-    <div class="row">
-      <div class="col s6 offset-s3">
-        <div class="card">
-          <div class="card-image">
-            <img src="{{img}}" alt="{{title}}" />
-            <span
-              class="card-title"
-              style="color: black; font-weight: 500"
-            >{{title}}</span>
-          </div>
-          <div class="card-content">
-            <p class="price">{{price}}</p>
-          </div>
-          <div class="card-action">
-            <form action="cart/add/{{id}}" method="POST">
-              <input type="hidden" name="id" value="{{id}}" />
-              <button class="btn btn-primary">Remove from cart</button>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Item Price</th>
+        <th>Quantity</th>
+        <th></th>
+      </tr>
+    </thead>
+
+    {{#each cartList}}
+
+      <tbody>
+        <tr>
+          <td>{{title}}</td>
+          <td>{{price}}$</td>
+          <td>{{quantity}}</td>
+          <td>
+            <form
+              action="/cart/remove/{{id}}"
+              method="POST"
+              style="margin: auto;"
+            >
+              <button class="btn btn-primary">Delete</button>
             </form>
-          </div>
-        </div>
-      </div>
-    </div>
+          </td>
+        </tr>
+      </tbody>
+    {{/each}}
 
-  {{/each}}
+  </table>
+
+  <h2>Total price: {{totalPrice}} </h2>
 {{else}}
   <h1>Cart is empty</h1>
 {{/if}}

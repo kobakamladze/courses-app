@@ -1,13 +1,15 @@
 import express from "express";
 
 import { addToCart, cartList, removeFromCart } from "../models/cartModel.js";
+import { getTotalPrice } from "../models/cartModel.js";
 
 const cartRouter = express.Router();
 
 cartRouter.get("/", (req, res) => {
   console.log("CART LIST === " + JSON.stringify(cartList));
 
-  res.render("cart", { cartList });
+  const totalPrice = getTotalPrice();
+  res.render("cart", { cartList, totalPrice });
 });
 
 cartRouter.post("/add/:courseId", (req, res) => {

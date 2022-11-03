@@ -3,22 +3,19 @@ import { v4 as uuid } from "uuid";
 const coursesList = [
   {
     title: "Node JS",
-    price: "60$",
+    price: 60,
     img: "https://ih1.redbubble.net/image.1637717834.1604/aps,504x498,small,transparent-pad,600x600,f8f8f8.u1.jpg",
     id: uuid(),
   },
 ];
 
-function addCourse({ title, price, img }) {
-  const newCourse = { title, price, img, id: uuid() };
+function addCourse({ title, price, img, idParam }) {
+  const id = idParam ? idParam : uuid();
 
+  const newCourse = { title, price, img, id };
   coursesList.push(newCourse);
 
-  const recentlyAddedCourse = coursesList.find(
-    (course) => course.id === newCourse.id
-  );
-
-  return Promise.resolve(recentlyAddedCourse);
+  return Promise.resolve();
 }
 
 function deleteCourse(id) {

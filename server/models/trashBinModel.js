@@ -8,7 +8,7 @@ function addToTrash(id) {
   const courseMatch = trashList.findIndex((course) => course.id === id);
   if (courseMatch !== -1) {
     console.error("Course is already added to trash bin!");
-    return null;
+    return Promise.reject();
   }
 
   trashList.push(courseToAddToCart);
