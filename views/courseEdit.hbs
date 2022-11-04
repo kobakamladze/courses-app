@@ -1,35 +1,35 @@
-<form action="/courses/{{id}}/edit" method="POST">
+<form action='/courses/{{id}}/edit' method='POST'>
 
-  <div class="input-field col s12">
+  <div class='input-field col s12'>
     <input
-      id="title"
-      name="title"
-      type="text"
-      class="validate"
-      value="{{title}}"
+      id='title'
+      name='title'
+      type='text'
+      class='validate'
+      value='{{title}}'
     />
-    <label for="title">Course name</label>
-    <span class="helper-text" data-error="Enter name of course"></span>
+    <label for='title'>Course name</label>
+    <span class='helper-text' data-error='Enter name of course'></span>
   </div>
 
-  <div class="input-field col s12">
+  <div class='input-field col s12'>
     <input
-      id="price"
-      name="price"
-      type="number"
-      class="validate"
-      min="1"
-      value="{{price}}"
+      id='price'
+      name='price'
+      type='number'
+      class='validate'
+      min='1'
+      value='{{price}}'
     />
-    <label for="price">Price</label>
-    <span class="helper-text" data-error="Enter price/number"></span>
+    <label for='price'>Price</label>
+    <span class='helper-text' data-error='Enter price/number'></span>
   </div>
 
-  <div class="input-field col s12">
-    <input id="img" name="image" type="text" class="validate" value="{{img}}" />
-    <label for="img">URL of image</label>
-    <span class="helper-text" data-error="Enter url of image"></span>
+  <div class='input-field col s12'>
+    <input id='img' name='image' type='text' class='validate' value='{{img}}' />
+    <label for='img'>URL of image</label>
+    <span class='helper-text' data-error='Enter url of image'></span>
   </div>
 
-  <button class="btn btn-primary">Save Changes</button>
+  <button class='btn btn-primary'>Save Changes</button>
 </form>

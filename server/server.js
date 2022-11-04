@@ -41,12 +41,20 @@ app.use('/cart', cartRouter);
 app.use('/trash', trashBinRouter);
 app.use('/*', homeRouter);
 
-mongoose
-  .connect(
-    `mongodb+srv://koba08:${DB_PASSWORD}@coursesapp.bki86ux.mongodb.net/?retryWrites=true&w=majority`,
-    () => console.log('Connected to DB...')
+function startServer() {
+  return new Promise(resolve =>
+    mongoose.connect(
+      `mongodb+srv://koba08:${DB_PASSWORD}@coursesapp.bki86ux.mongodb.net/?retryWrites=true&w=majority`,
+      () => {
+        console.log('Connected to DB...');
+        resolve();
+      }
+    )
   )
-  .then(() =>
-    app.listen(PORT, () => console.log(`Listening on PORT ${PORT}...`))
-  )
-  .catch(err => console.log(err));
+    .then(() =>
+      app.listen(PORT, () => console.log(`Listening on PORT ${PORT}...`))
+    )
+    .catch(err => console.log(err));
+}
+
+startServer();
