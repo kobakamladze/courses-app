@@ -1,29 +1,35 @@
-import { getCourseById } from "../routes/coursesRouter.js";
+import { Schema, model } from 'mongoose';
+import { v4 as uuid } from 'uuid';
 
-const trashList = [];
+import { getCourseById } from '../routes/coursesRouter.js';
+import { Course } from './coursesModel.js';
+
+const trashSchema = new Schema({
+  courseId: { type: String, default: uuid.v4 },
+  title: { type: String, required: true },
+  price: { type: Number, required: true },
+  img: { type: String, required: true },
+});
+
+const Trash = model('Trash', trashSchema);
+
+function getAllTrashElements() {
+  return Trash.find();
+}
 
 function addToTrash(id) {
-  const courseToAddToCart = getCourseById(id);
-
-  const courseMatch = trashList.findIndex((course) => course.id === id);
-  if (courseMatch !== -1) {
-    console.error("Course is already added to trash bin!");
-    return Promise.reject();
-  }
-
-  trashList.push(courseToAddToCart);
-
-  return Promise.resolve();
+  return Course.findById(id).then(({ title, price, img }) => {
+    const trashElement = new Trash({ title, price, img });
+    return trashElement.save();
+  });
 }
 
 function deleteFromTrash(id) {
-  const indexOfRemovableCourse = trashList.findIndex(
-    (course) => course.id === id
+  console.log('ID PARAM === ' + id);
+
+  return Trash.findByIdAndDelete(id).then(course =>
+    console.log('DELETED FROM TRASH === ' + JSON.stringify(course))
   );
-
-  trashList.splice(indexOfRemovableCourse, 1);
-
-  return Promise.resolve();
 }
 
-export { trashList, addToTrash, deleteFromTrash };
+export { addToTrash, deleteFromTrash, getAllTrashElements, Trash };

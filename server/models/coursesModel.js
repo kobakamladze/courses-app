@@ -2,6 +2,7 @@ import { v4 as uuid } from 'uuid';
 import { Schema, model } from 'mongoose';
 
 const courseSchema = new Schema({
+  courseId: { type: String, default: uuid.v4, required: true },
   title: {
     type: String,
     required: true,
@@ -17,45 +18,34 @@ const courseSchema = new Schema({
 
 const Course = model('Course', courseSchema);
 
-const coursesList = [
-  {
-    title: 'Node JS',
-    price: 60,
-    img: 'https://ih1.redbubble.net/image.1637717834.1604/aps,504x498,small,transparent-pad,600x600,f8f8f8.u1.jpg',
-    id: uuid(),
-  },
-];
+// const coursesList = [
+//   {
+//     title: 'Node JS',
+//     price: 60,
+//     img: 'https://ih1.redbubble.net/image.1637717834.1604/aps,504x498,small,transparent-pad,600x600,f8f8f8.u1.jpg',
+//     id: uuid(),
+//   },
+// ];
 
-function addCourse({ title, price, img, idParam }) {
-  // const id = idParam ? idParam : uuid();
-  // const newCourse = { title, price, img, id };
-  // coursesList.push(newCourse);
-  // return Promise.resolve();
+function addCourse({ courseId, title, price, img }) {
+  const course = new Course({ courseId, title, price, img });
 
-  const course = new Course({ title, price, img });
-  console.log(course);
-  return course
-    .save()
-    .then(res => {
-      console.log(JSON.stringify(res));
-    })
-    .catch(err => {
-      console.log(err);
-    });
+  // Set uuid if was not sent
+  courseId = courseId ? courseId : uuid;
+
+  return course.save().catch(err => {
+    console.log(err);
+  });
 }
 
 function deleteCourse(id) {
-  const indexOfCourseToRemove = coursesList.findIndex(
-    course => course.id === id
-  );
-
-  if (indexOfCourseToRemove === -1) {
-    return Promise.reject();
-  }
-
-  coursesList.splice(indexOfCourseToRemove, 1);
-
-  return Promise.resolve();
+  return Course.deleteOne({ _id: id }).catch(err => {
+    console.log(err);
+  });
 }
 
-export { addCourse, coursesList, deleteCourse };
+function getAllCourses() {
+  return Course.find().then(res => res);
+}
+
+export { addCourse, deleteCourse, getAllCourses, Course };
