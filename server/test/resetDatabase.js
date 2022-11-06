@@ -27,12 +27,20 @@ describe('resetDatabase', () => {
     console.log(uuid());
     return Course.deleteMany()
       .then(() =>
-        axios.post(`${DOMAIN}/add`, {
-          courseId: uuid(),
-          title: 'Node JS',
-          price: 60,
-          img: 'https://ih1.redbubble.net/image.1637717834.1604/aps,504x498,small,transparent-pad,600x600,f8f8f8.u1.jpg',
-        })
+        Promise.all([
+          axios.post(`${DOMAIN}/add`, {
+            productId: uuid(),
+            title: 'Node JS',
+            price: 60,
+            img: 'https://ih1.redbubble.net/image.1637717834.1604/aps,504x498,small,transparent-pad,600x600,f8f8f8.u1.jpg',
+          }),
+          axios.post(`${DOMAIN}/add`, {
+            productId: uuid(),
+            title: 'Angular JS',
+            price: 120,
+            img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Angular_full_color_logo.svg/2048px-Angular_full_color_logo.svg.png',
+          }),
+        ])
       )
       .then(() => Trash.deleteMany())
       .then(() => CartItem.deleteMany());

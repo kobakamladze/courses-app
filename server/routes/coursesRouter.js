@@ -1,50 +1,46 @@
 import express from 'express';
 
-import { Course, getAllCourses } from '../models/coursesModel.js';
+import {
+  Course,
+  findCourseByIdAndUpdate,
+  getAllCourses,
+} from '../models/coursesModel.js';
 
 const coursesRouter = express.Router();
 
-function getCourseById(courseId) {
-  return Course.findById(courseId);
+function getCourseById(id) {
+  return Course.findById(id);
 }
 
 coursesRouter.get('/', (req, res) =>
   getAllCourses().then(coursesList => res.render('courses', { coursesList }))
 );
 
-coursesRouter.get('/:courseId', (req, res) => {
-  const courseId = req.params.courseId;
-  return getCourseById(courseId).then(({ img, title, price }) => {
+coursesRouter.get('/:id', (req, res) => {
+  const id = req.params.id;
+  return getCourseById(id).then(({ img, title, price }) => {
     res.render('course', { img, title, price });
   });
 });
 
-coursesRouter.get('/:courseId/edit', (req, res) => {
+coursesRouter.get('/:id/edit', (req, res) => {
   if (!req.query.allow) {
     return res.render('error');
   }
 
-  const courseId = req.params.courseId;
-  return getCourseById(courseId).then(
-    ({ img, title, price, _id, courseId }) => {
-      console.log({ img, title, price, _id, courseId });
-      return res.render('courseEdit', { img, title, price, id: _id, courseId });
-    }
-  );
+  const id = req.params.id;
+  return getCourseById(id).then(({ img, title, price, _id, productId }) => {
+    console.log({ img, title, price, _id, productId });
+    return res.render('courseEdit', { img, title, price, id: _id, productId });
+  });
 });
 
-coursesRouter.post('/:courseId/edit', (req, res) => {
-  const courseId = req.params.courseId;
-  const courseFoundById = getCourseById(courseId).then(
-    ({ price: oldPrice, img: oldImg, title: oldTitle }) => {
-      const { price: newPrice, img: newImg, title: newTitle } = req.body;
+coursesRouter.post('/:id/edit', (req, res) => {
+  const id = req.params.id;
+  const { price, img, title } = req.body;
 
-      courseFoundById.price = newPrice ? newPrice : oldPrice;
-      courseFoundById.title = newTitle ? newTitle : oldTitle;
-      courseFoundById.img = newImg ? newImg : oldImg;
-
-      return res.redirect('/courses');
-    }
+  return findCourseByIdAndUpdate(id, { price, img, title }).then(() =>
+    res.redirect('/courses')
   );
 });
 

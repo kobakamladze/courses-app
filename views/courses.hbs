@@ -7,8 +7,10 @@
         <div class='card'>
           <div class='card-image'>
             <img src='{{img}}' alt='{{title}}' />
-            <span class='card-title' style='color: black; font-weight: 500'>All
-              Courses:</span>
+            <span
+              class='card-title'
+              style='color: black; font-weight: 500'
+            >{{title}}</span>
           </div>
           <div class='card-content'>
             <p class='price'>{{price}}$</p>
@@ -17,7 +19,10 @@
             <a href='/courses/{{id}}'>Buy course</a>
             <a href='/courses/{{id}}/edit?allow=true'>Edit course</a>
 
-            <form action='cart/add/{{id}}' method='POST'>
+            <form
+              action='cart/add/{{id}}?productId={{productId}}'
+              method='POST'
+            >
               <input type='hidden' name='id' value='{{id}}' />
               <button class='btn btn-primary'>Add to cart</button>
             </form>

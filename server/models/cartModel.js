@@ -5,7 +5,7 @@ import { Schema, model } from 'mongoose';
 import { getCourseById } from '../routes/coursesRouter.js';
 
 const cartItemSchema = new Schema({
-  courseId: { type: String, default: uuid.v4, required: true },
+  productId: { type: String, default: uuid.v4 },
   title: { type: String, required: true },
   price: { type: Number, required: true },
   img: { type: String, required: true },
@@ -13,31 +13,30 @@ const cartItemSchema = new Schema({
 
 const CartItem = model('CartItem', cartItemSchema);
 
+function getTotalPrice(cartList) {
+  return _.reduce(
+    cartList,
+    (acc, { price, quantity }) => acc + price * quantity,
+    0
+  );
+}
+
 function getCartList() {
   return CartItem.find()
-    .select('courseId title price img')
-    .then(cartList => {
-      console.log('QUERIED CART LIST === ' + JSON.stringify(cartList));
-
-      const groupedCartList = _.chain(cartList)
-        .pick(['courseId', 'title', 'price', 'img'])
-        .groupBy('courseId')
-        .values()
+    .select('productId title price img')
+    .then(cartList =>
+      _.chain(cartList)
+        .map(cartList =>
+          _.pick(cartList, ['productId', 'title', 'price', 'img'])
+        )
+        .groupBy('productId')
         .map(subArray => ({
           ...subArray[0],
           quantity: subArray.length,
         }))
-        .value();
-      console.log(
-        JSON.stringify(
-          'FORMATTED ARRAY OF CART ITEMS === ' + JSON.stringify(groupedCartList)
-        )
-      );
-      return cartList;
-    });
+        .value()
+    );
 }
-
-// getCartList();
 
 function getCartItemById(id) {
   return CartItem.findById(id);
@@ -51,49 +50,18 @@ function addToCart(id) {
         return Promise.reject();
       }
 
-      const { courseId, title, price, img } = courseToAddToCart;
+      const { productId, title, price, img } = courseToAddToCart;
 
-      const newCartItem = new CartItem({ courseId, title, price, img });
+      console.log('NEW CART ITEM PARAMS === ' + courseToAddToCart);
+
+      const newCartItem = new CartItem({ productId, title, price, img });
       return newCartItem.save();
     })
-    .then();
-
-  // const matchedCourseIndex = cartList.findIndex(course => course.id === id);
-  // if (matchedCourseIndex !== -1) {
-  //   const macthedCourse = cartList[matchedCourseIndex];
-
-  //   macthedCourse.quantity += 1;
-  //   macthedCourse.price = Number(macthedCourse.price) * macthedCourse.quantity;
-
-  //   return Promise.resolve();
-  // }
-
-  // cartList.push({ ...courseToAddToCart, quantity: 1 });
-
-  // return Promise.resolve();
-}
-
-function getTotalPrice() {
-  const coursesTotalPrice = _.reduce(
-    cartList,
-    (acc, { price }) => acc + Number(price),
-    0
-  );
-
-  return coursesTotalPrice;
+    .catch(err => console.log(err));
 }
 
 function removeFromCart(id) {
-  const indexOfRemovableCourse = cartList.findIndex(course => course.id === id);
-
-  if (indexOfRemovableCourse === -1) {
-    console.error('Course could not be found!');
-    return Promise.reject();
-  }
-
-  cartList.splice(indexOfRemovableCourse, 1);
-
-  return Promise.resolve();
+  return CartItem.deleteMany({ productId: id });
 }
 
 export { addToCart, removeFromCart, getTotalPrice, getCartList, CartItem };

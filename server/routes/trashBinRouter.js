@@ -1,6 +1,7 @@
 import express from 'express';
-import { addCourse, deleteCourse } from '../models/coursesModel.js';
 
+import { removeFromCart } from '../models/cartModel.js';
+import { addCourse, deleteCourse } from '../models/coursesModel.js';
 import {
   addToTrash,
   deleteFromTrash,
@@ -16,11 +17,12 @@ trashBinRouter.get('/', (req, res) => {
 });
 
 trashBinRouter.post('/add/:id', (req, res) => {
-  const courseId = req.params.courseId;
-  console.log(courseId);
+  const id = req.params.id;
+  console.log(id);
 
-  return addToTrash(courseId)
-    .then(() => deleteCourse(courseId))
+  return addToTrash(id)
+    .then(() => removeFromCart(id))
+    .then(() => deleteCourse(id))
     .then(() => {
       return res.redirect('/trash');
     })
@@ -30,9 +32,9 @@ trashBinRouter.post('/add/:id', (req, res) => {
     });
 });
 
-trashBinRouter.post('/delete/:courseId', (req, res) => {
-  const courseId = req.query.courseId;
-  return deleteFromTrash(courseId)
+trashBinRouter.post('/delete/:id', (req, res) => {
+  const id = req.query.id;
+  return deleteFromTrash(id)
     .then(() => res.redirect('/'))
     .catch(err => {
       if (err) console.log(err);
@@ -40,12 +42,14 @@ trashBinRouter.post('/delete/:courseId', (req, res) => {
     });
 });
 
-trashBinRouter.post('/recover/:courseId', (req, res) => {
-  const { courseId } = req.params;
-  const { title, img, price } = req.query;
+trashBinRouter.post('/recover/:id', (req, res) => {
+  const id = req.params.id;
+  const { title, img, price, productId } = req.query;
 
-  return addCourse({ title, img, price, courseId })
-    .then(() => deleteFromTrash(courseId))
+  console.log({ id, title, img, price, productId });
+
+  return addCourse({ title, img, price, productId })
+    .then(() => deleteFromTrash(id))
     .then(() => res.redirect('/courses'))
     .catch(err => {
       if (err) console.log(err);
