@@ -1,12 +1,9 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
-import { app } from './app.js';
+import { app, PORT } from './app.js';
 
 dotenv.config();
-
-// Choosing PORT
-const PORT = process.env.PORT || 3000;
 
 const DB_PASSWORD = process.env.DB_PASSWORD;
 

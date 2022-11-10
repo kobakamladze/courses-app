@@ -9,6 +9,10 @@ const cartItemSchema = new Schema({
   title: { type: String, required: true },
   price: { type: Number, required: true },
   img: { type: String, required: true },
+  user: {
+    ref: 'Users',
+    type: Schema.Types.ObjectId,
+  },
 });
 
 const CartItem = model('CartItem', cartItemSchema);
@@ -51,8 +55,6 @@ function addToCart(id) {
       }
 
       const { productId, title, price, img } = courseToAddToCart;
-
-      console.log('NEW CART ITEM PARAMS === ' + courseToAddToCart);
 
       const newCartItem = new CartItem({ productId, title, price, img });
       return newCartItem.save();
