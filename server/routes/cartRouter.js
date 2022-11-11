@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 import express from 'express';
 
 import { addToCart, getCartList, removeFromCart } from '../models/cartModel.js';
@@ -7,15 +9,22 @@ import { User, userSchema } from '../models/userModel.js';
 
 const cartRouter = express.Router();
 
-cartRouter.get('/', (req, res) => {
-  // return getCartList()
-  //   .then(cartList => Promise.all([cartList, getTotalPrice(cartList)]))
-  //   .then(([cartList, totalPrice]) => {
-  //     return res.render('cart', { cartList, totalPrice });
-  //   });
-  const pop = req.user.populate('course');
-  console.log(JSON.stringify(pop));
-});
+cartRouter.get('/', (req, res) =>
+  req.user.populate('cartItems.courseId').then(({ cartItems }) => {
+    console.log(cartItems);
+    const modifiedResponse = cartItems.length
+      ? _.map(cartItems, ({ courseId, quantity }) => ({
+          ...courseId._doc,
+          quantity,
+        }))
+      : [];
+
+    return res.render('cart', {
+      cartItems: modifiedResponse,
+      totalPrice: getTotalPrice(modifiedResponse),
+    });
+  })
+);
 
 cartRouter.post('/add/:id', (req, res) => {
   const id = req.params.id;
