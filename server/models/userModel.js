@@ -12,20 +12,22 @@ const userSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  cartItems: [
-    {
-      quantity: {
-        type: Number,
-        required: true,
-        default: 1,
+  cart: {
+    items: [
+      {
+        quantity: {
+          type: Number,
+          required: true,
+          default: 0,
+        },
+        courseId: {
+          ref: 'Course',
+          type: Schema.Types.ObjectId,
+          required: true,
+        },
       },
-      courseId: {
-        ref: 'Course',
-        type: Schema.Types.ObjectId,
-        required: true,
-      },
-    },
-  ],
+    ],
+  },
   password: {
     type: String,
     // TO DO
@@ -33,20 +35,33 @@ const userSchema = mongoose.Schema({
   },
 });
 
+// User methods
 userSchema.methods.addToCart = function (course) {
-  const courseExistence = _.find(this.cartItems, course._id);
-  if (!courseExistence) this.cartItems.push({ courseId: course._id });
+  const courseExistence = _.find(
+    this.cart.items,
+    item => item.courseId.toString() === course._id.toString()
+  );
+
+  if (!courseExistence) this.cart.items.push({ courseId: course._id });
 
   const idx = _.findIndex(
-    this.cartItems,
+    this.cart.items,
     cartItem => cartItem.courseId.toString() === course._id.toString()
   );
-  console.log('INDEX === ' + idx);
-  console.log('_ID === ' + course._id.toString());
-  console.log(this.cartItems[0].courseId.toString());
-  if (idx >= 0) this.cartItems[idx].quantity = this.cartItems[idx].quantity + 1;
 
-  console.log('CART ITEM === ' + this.cartItems[idx]);
+  if (idx >= 0)
+    this.cart.items[idx].quantity = this.cart.items[idx].quantity + 1;
+
+  return this.save();
+};
+
+userSchema.methods.deleteFromCart = function (course) {
+  const idx = _.findIndex(
+    this.cart.items,
+    cartItem => cartItem.courseId.toString() === course._id.toString()
+  );
+
+  if (idx >= 0) this.cart.items.splice(idx, 1);
 
   return this.save();
 };

@@ -7,6 +7,7 @@ import { v4 as uuid } from 'uuid';
 import { Trash } from '../models/trashBinModel.js';
 import { Course } from '../models/coursesModel.js';
 import { CartItem } from '../models/cartModel.js';
+import { User } from '../models/userModel.js';
 
 dotenv.config();
 chai.expect();
@@ -24,7 +25,6 @@ describe('resetDatabase', () => {
   });
 
   it('clearing trash ansd adding course back to courses', () => {
-    console.log(uuid());
     return Course.deleteMany()
       .then(() =>
         Promise.all([
@@ -42,6 +42,7 @@ describe('resetDatabase', () => {
           }),
         ])
       )
+      .then(() => User.deleteMany())
       .then(() => Trash.deleteMany())
       .then(() => CartItem.deleteMany());
   });

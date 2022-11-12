@@ -23,7 +23,6 @@ const PORT = process.env.PORT || 3000;
 
 app.use((req, res, next) => {
   return User.findOne({ email: 'testApp@test.com' }).then(user => {
-    console.log('FETCHED USER === ' + user);
     if (!user) {
       console.log('CREATING NEW USER!');
       const user = new User({
