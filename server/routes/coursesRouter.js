@@ -1,4 +1,5 @@
 import express from 'express';
+import { signed } from '../middlware/authCheck.js';
 
 import {
   Course,
@@ -23,7 +24,7 @@ coursesRouter.get('/:id', (req, res) => {
   });
 });
 
-coursesRouter.get('/:id/edit', (req, res) => {
+coursesRouter.get('/:id/edit', signed, (req, res) => {
   if (!req.query.allow) {
     return res.render('error');
   }
@@ -35,7 +36,7 @@ coursesRouter.get('/:id/edit', (req, res) => {
   });
 });
 
-coursesRouter.post('/:id/edit', (req, res) => {
+coursesRouter.post('/:id/edit', signed, (req, res) => {
   const id = req.params.id;
   const { price, img, title } = req.body;
 

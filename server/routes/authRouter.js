@@ -1,13 +1,13 @@
 import express from 'express';
 
-import authCheck from '../middlware/authCheck.js';
+import { signed, notSigned } from '../middlware/authCheck.js';
 import { User } from '../models/userModel.js';
 
 const authRouter = express.Router();
 
-authRouter.get('/logIn', (req, res) => res.render('auth/logIn'));
+authRouter.get('/logIn', notSigned, (req, res) => res.render('auth/logIn'));
 
-authRouter.post('/logIn', (req, res) => {
+authRouter.post('/logIn', notSigned, (req, res) => {
   return User.findOne({ email: 'testApp@test.com' }).then(user => {
     req.session.user = user;
     req.session.isAuthenticated = true;
@@ -20,7 +20,7 @@ authRouter.post('/logIn', (req, res) => {
   });
 });
 
-authRouter.get('/logOut', authCheck, (req, res) => {
+authRouter.get('/logOut', signed, (req, res) => {
   req.session.destroy(() => res.redirect('/'));
 });
 

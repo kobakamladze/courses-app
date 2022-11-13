@@ -2,10 +2,11 @@ import _ from 'lodash';
 import express from 'express';
 
 import { Checkout } from '../models/checkoutModel.js';
+import { signed } from '../middlware/authCheck.js';
 
 const checkoutRouter = express.Router();
 
-checkoutRouter.post('/', (req, res) =>
+checkoutRouter.post('/', signed, (req, res) =>
   req.user
     .populate('cart.items.courseId')
     .then(({ cart: { items } }) => {

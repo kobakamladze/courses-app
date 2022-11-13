@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import express from 'express';
 
+import { signed } from '../middlware/authCheck.js';
 import { Course } from '../models/coursesModel.js';
 
 const cartRouter = express.Router();
@@ -13,7 +14,7 @@ function getTotalPrice(cartList) {
   );
 }
 
-cartRouter.get('/', (req, res) =>
+cartRouter.get('/', signed, (req, res) =>
   req.user.populate('cart.items.courseId').then(({ cart: { items } }) => {
     const modifiedItems = items.length
       ? _.map(items, ({ courseId, quantity }) => ({
@@ -29,7 +30,7 @@ cartRouter.get('/', (req, res) =>
   })
 );
 
-cartRouter.post('/add/:id', (req, res) => {
+cartRouter.post('/add/:id', signed, (req, res) => {
   const id = req.params.id;
 
   return Course.findById(id)
@@ -37,7 +38,7 @@ cartRouter.post('/add/:id', (req, res) => {
     .then(() => res.redirect('/cart'));
 });
 
-cartRouter.post('/remove/:id', (req, res) => {
+cartRouter.post('/remove/:id', signed, (req, res) => {
   const id = req.params.id;
 
   return req.user

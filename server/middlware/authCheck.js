@@ -1,4 +1,4 @@
-function authCheck(req, res, next) {
+function signed(req, res, next) {
   if (!req.session.isAuthenticated) {
     return res.redirect('/auth/logIn');
   }
@@ -6,4 +6,12 @@ function authCheck(req, res, next) {
   next();
 }
 
-export default authCheck;
+function notSigned(req, res, next) {
+  if (req.session.isAuthenticated) {
+    return next();
+  }
+
+  // return res.redirect('/auth/logIn');
+}
+
+export { signed, notSigned };
