@@ -8,23 +8,21 @@ import { User, userSchema } from '../models/userModel.js';
 
 const cartRouter = express.Router();
 
-cartRouter.get('/', (req, res) => {
-  return req.user
-    .populate('cart.items.courseId')
-    .then(({ cart: { items } }) => {
-      const modifiedItems = items.length
-        ? _.map(items, ({ courseId, quantity }) => ({
-            ...courseId._doc,
-            quantity,
-          }))
-        : [];
+cartRouter.get('/', (req, res) =>
+  req.user.populate('cart.items.courseId').then(({ cart: { items } }) => {
+    const modifiedItems = items.length
+      ? _.map(items, ({ courseId, quantity }) => ({
+          ...courseId._doc,
+          quantity,
+        }))
+      : [];
 
-      return res.render('cart', {
-        cartList: modifiedItems,
-        totalPrice: getTotalPrice(modifiedItems),
-      });
+    return res.render('cart', {
+      cartList: modifiedItems,
+      totalPrice: getTotalPrice(modifiedItems),
     });
-});
+  })
+);
 
 cartRouter.post('/add/:id', (req, res) => {
   const id = req.params.id;
@@ -34,10 +32,11 @@ cartRouter.post('/add/:id', (req, res) => {
     .then(() => res.redirect('/cart'));
 });
 
-cartRouter.post('/remove/:productId', (req, res) => {
-  const { productId } = req.params;
+cartRouter.post('/remove/:id', (req, res) => {
+  const id = req.params.id;
 
-  return removeFromCart(productId)
+  return req.user
+    .deleteFromCart(id)
     .then(() => res.redirect('/cart'))
     .catch(err => {
       if (err) console.log(err);

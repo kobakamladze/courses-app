@@ -55,13 +55,19 @@ userSchema.methods.addToCart = function (course) {
   return this.save();
 };
 
-userSchema.methods.deleteFromCart = function (course) {
+userSchema.methods.deleteFromCart = function (id) {
   const idx = _.findIndex(
     this.cart.items,
-    cartItem => cartItem.courseId.toString() === course._id.toString()
+    cartItem => cartItem.courseId.toString() === id.toString()
   );
 
   if (idx >= 0) this.cart.items.splice(idx, 1);
+
+  return this.save();
+};
+
+userSchema.methods.clearCart = function () {
+  this.cart.items = [];
 
   return this.save();
 };

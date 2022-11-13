@@ -1,4 +1,5 @@
 import express from 'express';
+import session from 'express-session';
 import exphbs from 'express-handlebars';
 import Handlebars from 'handlebars';
 
@@ -8,7 +9,9 @@ import { addRouter } from './routes/addRouter.js';
 import { homeRouter } from './routes/homeRouter.js';
 import { cartRouter } from './routes/cartRouter.js';
 import { trashBinRouter } from './routes/trashBinRouter.js';
-import { User, userSchema } from './models/userModel.js';
+import { checkoutRouter } from './routes/checkoutRouter.js';
+import { authRouter } from './routes/authRouter.js';
+import { User } from './models/userModel.js';
 
 const hbs = exphbs.create({
   defaultLayout: 'main',
@@ -52,8 +55,14 @@ app.use((req, res, next) => {
 // Parsing json input
 app.use(express.json());
 app.use(express.urlencoded());
-// override with the X-HTTP-Method-Override header in the request
-//   app.use(methodOverride('X-HTTP-Method-Override'));
+
+// Session
+app.use(
+  session({
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 
 // View Engine
 app.engine('hbs', hbs.engine);
@@ -65,6 +74,8 @@ app.use('/add', addRouter);
 app.use('/courses', coursesRouter);
 app.use('/cart', cartRouter);
 app.use('/trash', trashBinRouter);
+app.use('/checkout', checkoutRouter);
+app.use('/auth', authRouter);
 app.use('/*', homeRouter);
 
 export { app, PORT };
