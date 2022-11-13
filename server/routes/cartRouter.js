@@ -1,49 +1,40 @@
 import _ from 'lodash';
-
 import express from 'express';
 
-import { addToCart, getCartList, removeFromCart } from '../models/cartModel.js';
 import { getTotalPrice } from '../models/cartModel.js';
 import { Course } from '../models/coursesModel.js';
-import { User, userSchema } from '../models/userModel.js';
 
 const cartRouter = express.Router();
 
 cartRouter.get('/', (req, res) =>
-  req.user.populate('cartItems.courseId').then(({ cartItems }) => {
-    console.log(cartItems);
-    const modifiedResponse = cartItems.length
-      ? _.map(cartItems, ({ courseId, quantity }) => ({
+  req.user.populate('cart.items.courseId').then(({ cart: { items } }) => {
+    const modifiedItems = items.length
+      ? _.map(items, ({ courseId, quantity }) => ({
           ...courseId._doc,
           quantity,
         }))
       : [];
 
     return res.render('cart', {
-      cartItems: modifiedResponse,
-      totalPrice: getTotalPrice(modifiedResponse),
+      cartList: modifiedItems,
+      totalPrice: getTotalPrice(modifiedItems),
     });
   })
 );
 
 cartRouter.post('/add/:id', (req, res) => {
   const id = req.params.id;
-  // return addToCart(productId)
-  //   .then(() => res.redirect('/cart'))
-  //   .catch(err => {
-  //     if (err) console.log(err);
-  //     return res.redirect('/');
-  //   });
-  console.log(req.user);
+
   return Course.findById(id)
     .then(course => req.user.addToCart(course))
-    .then(() => {});
+    .then(() => res.redirect('/cart'));
 });
 
-cartRouter.post('/remove/:productId', (req, res) => {
-  const { productId } = req.params;
+cartRouter.post('/remove/:id', (req, res) => {
+  const id = req.params.id;
 
-  return removeFromCart(productId)
+  return req.user
+    .deleteFromCart(id)
     .then(() => res.redirect('/cart'))
     .catch(err => {
       if (err) console.log(err);

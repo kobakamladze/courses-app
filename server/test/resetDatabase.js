@@ -25,9 +25,7 @@ describe('resetDatabase', () => {
   });
 
   it('clearing trash ansd adding course back to courses', () => {
-    console.log(uuid());
-    return User.findOneAndDelete({ name: 'testUser1' })
-      .then(() => Course.deleteMany())
+    return Course.deleteMany()
       .then(() =>
         Promise.all([
           axios.post(`${DOMAIN}/add`, {
@@ -44,6 +42,7 @@ describe('resetDatabase', () => {
           }),
         ])
       )
+      .then(() => User.deleteMany())
       .then(() => Trash.deleteMany())
       .then(() => CartItem.deleteMany());
   });

@@ -7,11 +7,6 @@ dotenv.config();
 
 const DB_PASSWORD = process.env.DB_PASSWORD;
 
-app.use((req, res, next) => {
-  console.log(`URL: http://localhost:${PORT}${req.url}, METHOD: ${req.method}`);
-  next();
-});
-
 // Checking database connection status
 mongoose.connection.once('open', () => console.log('Connected to DB...'));
 mongoose.connection.on('error', error => console.log(error));
