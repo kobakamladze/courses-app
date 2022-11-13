@@ -4,7 +4,6 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import { v4 as uuid } from 'uuid';
 
-import { Trash } from '../models/trashBinModel.js';
 import { Course } from '../models/coursesModel.js';
 import { CartItem } from '../models/cartModel.js';
 import { User } from '../models/userModel.js';
@@ -24,7 +23,7 @@ describe('resetDatabase', () => {
     );
   });
 
-  it('clearing trash ansd adding course back to courses', () => {
+  it('Reset', () => {
     return Course.deleteMany()
       .then(() =>
         Promise.all([
@@ -43,7 +42,6 @@ describe('resetDatabase', () => {
         ])
       )
       .then(() => User.deleteMany())
-      .then(() => Trash.deleteMany())
       .then(() => CartItem.deleteMany());
   });
 });

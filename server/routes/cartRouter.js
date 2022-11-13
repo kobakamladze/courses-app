@@ -1,10 +1,17 @@
 import _ from 'lodash';
 import express from 'express';
 
-import { getTotalPrice } from '../models/cartModel.js';
 import { Course } from '../models/coursesModel.js';
 
 const cartRouter = express.Router();
+
+function getTotalPrice(cartList) {
+  return _.reduce(
+    cartList,
+    (acc, { price, quantity }) => acc + price * quantity,
+    0
+  );
+}
 
 cartRouter.get('/', (req, res) =>
   req.user.populate('cart.items.courseId').then(({ cart: { items } }) => {
