@@ -1,23 +1,75 @@
 import express from 'express';
+import bcrypt from 'bcryptjs';
+import flash from 'connect-flash';
 
 import { signed, notSigned } from '../middlware/authCheck.js';
 import { User } from '../models/userModel.js';
 
 const authRouter = express.Router();
 
-authRouter.get('/logIn', notSigned, (req, res) => res.render('auth/logIn'));
+authRouter.get('/logIn', notSigned, (req, res) =>
+  res.render('auth/logIn', {
+    logInError: req.flash('logInError'),
+    registerError: req.flash('registerError'),
+  })
+);
 
 authRouter.post('/logIn', notSigned, (req, res) => {
-  return User.findOne({ email: 'testApp@test.com' }).then(user => {
-    req.session.user = user;
-    req.session.isAuthenticated = true;
-    req.session.save(err => {
-      if (err) {
-        throw err;
+  const { email, password } = req.body;
+
+  return User.findOne({ email })
+    .then(candidate => {
+      if (!candidate) {
+        req.flash('logInError', 'Email or password is incorrect.');
+        return res.redirect('/auth/logIn#login');
       }
-      res.redirect('/');
-    });
-  });
+      const emailCheck = candidate.email === email;
+      const passCheck = bcrypt.compareSync(password, candidate.password);
+
+      if (!emailCheck || !passCheck) {
+        req.flash('logInError', 'Email or password is incorrect.');
+        return res.redirect('/auth/logIn#login');
+      }
+
+      req.session.user = candidate;
+      req.session.isAuthenticated = true;
+      req.session.save(err => {
+        if (err) {
+          throw err;
+        }
+        res.redirect('/');
+      });
+    })
+    .finally();
+});
+
+authRouter.post('/register', (req, res) => {
+  const { email, password, repeat } = req.body;
+
+  return User.findOne({ email })
+    .then(user => {
+      if (user) {
+        req.flash('registerError', 'Email is already used.');
+        return res.redirect('/auth/logIn#signUp');
+      }
+
+      // Hashing password
+      const hashedPassword = bcrypt.hashSync(password, 10);
+
+      const newUser = new User({
+        email,
+        password: hashedPassword,
+        cart: { items: [] },
+      });
+
+      return newUser.save();
+    })
+    .then(() => res.redirect('/auth/logIn#login'))
+    .catch(err => {
+      console.log(JSON.stringify(err));
+      res.render('error', err);
+    })
+    .finally();
 });
 
 authRouter.get('/logOut', signed, (req, res) => {

@@ -11,7 +11,19 @@
     {{! LOG IN }}
     <div id='login' class='col s6 offset-s3'>
       <h1>Sign In</h1>
+
       <form action='/auth/logIn' method='POST'>
+
+        {{#if logInError.length}}
+          <p
+            style='padding: 6px 4px; background-color: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 1);
+            border-radius: 5px;
+            color:rgba(255, 0, 0, 1);
+            font-weight: 500;
+            text-align: center;'
+          >{{logInError}}</p>
+        {{/if}}
 
         <div class='input-field col s12'>
           <input
@@ -37,6 +49,8 @@
           <span class='helper-text' data-error='Enter Password'></span>
         </div>
 
+        <input type='hidden' name='_csrf' value='{{csurf}}' />
+
         <button class='btn btn-primary' type='submit'>Log In</button>
       </form>
     </div>
@@ -45,6 +59,18 @@
       <h1>Sign Up</h1>
 
       <form action='/auth/register' method='POST'>
+
+        {{#if registerError}}
+          <p
+            style='padding: 6px 4px; background-color: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 1);
+            border-radius: 5px;
+            color:rgba(255, 0, 0, 1);
+            font-weight: 500;
+            text-align: center;'
+          >{{registerError}}</p>
+        {{/if}}
+
         <div class='input-field col s12'>
           <input
             id='remail'
@@ -53,7 +79,7 @@
             class='validate'
             required
           />
-          <label for='remail'>Price</label>
+          <label for='remail'>Email</label>
           <span class='helper-text' data-error='Enter Email:'></span>
         </div>
 
@@ -80,6 +106,8 @@
           <label for='confirm'>Confirm Password</label>
           <span class='helper-text' data-error='Passwords do not match:'></span>
         </div>
+
+        <input type='hidden' name='_csrf' value='{{csurf}}' />
 
         <button class='btn btn-primary' type='submit'>Sign Up</button>
       </form>

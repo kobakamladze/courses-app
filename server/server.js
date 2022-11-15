@@ -12,4 +12,5 @@ mongoose
   .then(() =>
     app.listen(PORT, () => console.log(`Listening on PORT ${PORT}...`))
   )
-  .catch(err => console.log(err));
+  .catch(err => console.log(err))
+  .finally();

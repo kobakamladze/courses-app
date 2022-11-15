@@ -15,19 +15,22 @@ function getTotalPrice(cartList) {
 }
 
 cartRouter.get('/', signed, (req, res) =>
-  req.user.populate('cart.items.courseId').then(({ cart: { items } }) => {
-    const modifiedItems = items.length
-      ? _.map(items, ({ courseId, quantity }) => ({
-          ...courseId._doc,
-          quantity,
-        }))
-      : [];
+  req.user
+    .populate('cart.items.courseId')
+    .then(({ cart: { items } }) => {
+      const modifiedItems = items.length
+        ? _.map(items, ({ courseId, quantity }) => ({
+            ...courseId._doc,
+            quantity,
+          }))
+        : [];
 
-    return res.render('cart', {
-      cartList: modifiedItems,
-      totalPrice: getTotalPrice(modifiedItems),
-    });
-  })
+      return res.render('cart', {
+        cartList: modifiedItems,
+        totalPrice: getTotalPrice(modifiedItems),
+      });
+    })
+    .finally()
 );
 
 cartRouter.post('/add/:id', signed, (req, res) => {
@@ -35,7 +38,8 @@ cartRouter.post('/add/:id', signed, (req, res) => {
 
   return Course.findById(id)
     .then(course => req.user.addToCart(course))
-    .then(() => res.redirect('/cart'));
+    .then(() => res.redirect('/cart'))
+    .finally();
 });
 
 cartRouter.post('/remove/:id', signed, (req, res) => {
@@ -47,7 +51,8 @@ cartRouter.post('/remove/:id', signed, (req, res) => {
     .catch(err => {
       if (err) console.log(err);
       return res.render('error', { error: err });
-    });
+    })
+    .finally();
 });
 
 export { cartRouter };

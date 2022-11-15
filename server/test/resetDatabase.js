@@ -42,6 +42,7 @@ describe('resetDatabase', () => {
         ])
       )
       .then(() => User.deleteMany())
-      .then(() => CartItem.deleteMany());
+      .then(() => CartItem.deleteMany())
+      .finally();
   });
 });

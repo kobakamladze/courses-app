@@ -8,7 +8,7 @@ const userSchema = mongoose.Schema({
     required: true,
     unique: true,
   },
-  name: {
+  password: {
     type: String,
     required: true,
   },
@@ -27,11 +27,6 @@ const userSchema = mongoose.Schema({
         },
       },
     ],
-  },
-  password: {
-    type: String,
-    // TO DO
-    required: false,
   },
 });
 

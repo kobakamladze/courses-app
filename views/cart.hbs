@@ -24,6 +24,9 @@
               method='POST'
               style='margin: auto;'
             >
+
+              <input type='hidden' name='_csrf' value='{{@root.csurf}}' />
+
               <button class='btn btn-primary'>Delete</button>
             </form>
           </td>
@@ -36,6 +39,8 @@
   <h2>Total price: {{totalPrice}}$</h2>
 
   <form action='/checkout' method='POST'>
+    <input type='hidden' name='_csrf' value='{{csurf}}' />
+
     <button type='submit' class='btn btn-primary'>Checkout</button>
   </form>
 {{else}}

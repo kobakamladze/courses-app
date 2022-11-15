@@ -3,9 +3,13 @@ import express from 'express';
 import session from 'express-session';
 import exphbs from 'express-handlebars';
 import Handlebars from 'handlebars';
+import csurf from 'csurf';
+import flash from 'connect-flash';
+
+import authStatus from './middlware/authStatus.js';
+import userModelSetup from './middlware/userModelSetup.js';
 
 import { allowInsecurePrototypeAccess } from '@handlebars/allow-prototype-access';
-import authStatus from './middlware/authStatus.js';
 import { default as connectMongoDBSession } from 'connect-mongodb-session';
 
 // Route imports
@@ -29,32 +33,8 @@ const app = express();
 // Choosing PORT
 const PORT = process.env.PORT || 3000;
 
-// app.use((req, res, next) => {
-//   return User.findOne({ email: 'testApp@test.com' }).then(user => {
-//     if (!user) {
-//       console.log('CREATING NEW USER!');
-//       const user = new User({
-//         email: 'testApp@test.com',
-//         name: 'testUser1',
-//         password: 'TESTEST123',
-//       });
-
-//       user.save();
-
-//       req.user = user;
-//       next();
-//     }
-
-//     if (user) {
-//       req.user = user;
-//       next();
-//     }
-//   });
-// });
-
 // URI
-const DB_PASSWORD = process.env.DB_PASSWORD;
-const MONGO_URI = `mongodb+srv://koba08:${DB_PASSWORD}@coursesapp.bki86ux.mongodb.net/?retryWrites=true&w=majority`;
+const MONGO_URI = process.env.MONGODB_URI;
 
 // Sessions storage in database
 const MongoDBStore = connectMongoDBSession(session);
@@ -69,20 +49,24 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded());
 
-// Session
+// Session and user
 app.use(
   session({
-    secret: 'secret',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     store,
   })
 );
+app.use(csurf());
+app.use(flash());
 app.use((req, res, next) => {
-  console.log(req.session);
+  // console.log(req.session);
   next();
 });
+
 app.use(authStatus);
+app.use(userModelSetup);
 
 // View Engine
 app.engine('hbs', hbs.engine);

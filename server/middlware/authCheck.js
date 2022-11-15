@@ -7,11 +7,11 @@ function signed(req, res, next) {
 }
 
 function notSigned(req, res, next) {
-  if (req.session.isAuthenticated) {
+  if (!req.session.isAuthenticated) {
     return next();
   }
 
-  // return res.redirect('/auth/logIn');
+  return res.redirect('/');
 }
 
 export { signed, notSigned };

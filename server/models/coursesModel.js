@@ -34,17 +34,21 @@ function addCourse({ productId, title, price, img }) {
 }
 
 function deleteCourse(id) {
-  return Course.deleteOne({ _id: id }).catch(err => {
-    console.log(err);
-  });
+  return Course.deleteOne({ _id: id })
+    .catch(err => {
+      console.log(err);
+    })
+    .finally();
 }
 
 function getAllCourses() {
-  return Course.find().then(res => res);
+  return Course.find()
+    .then(res => res)
+    .finally();
 }
 
 function findCourseByIdAndUpdate(id, params) {
-  return Course.findByIdAndUpdate(id, { ...params });
+  return Course.findByIdAndUpdate(id, { ...params }).finally();
 }
 
 export {

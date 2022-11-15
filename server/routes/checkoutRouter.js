@@ -31,6 +31,7 @@ checkoutRouter.post('/', signed, (req, res) =>
         res.render('checkout', { checkoutList: userCheckout })
       )
     )
+    .finally()
 );
 
 export { checkoutRouter };
