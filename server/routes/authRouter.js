@@ -72,9 +72,10 @@ authRouter.post('/register', (req, res) => {
         cart: { items: [] },
       });
 
-      return mailer
-        .sendMail(emialSetUp(email), err => console.log(err))
-        .then(() => newUser.save());
+      return newUser.save().then(() => {
+        const emailOptions = emialSetUp(email);
+        return mailer.sendMail(emailOptions, err => console.log(err));
+      });
     })
     .then(() => res.redirect('/auth/logIn#login'))
     .catch(err => {
