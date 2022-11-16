@@ -1,9 +1,19 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
-import flash from 'connect-flash';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+import nodemailer from 'nodemailer';
+import sgTransport from 'nodemailer-sendgrid-transport';
+
+const mailer = nodemailer.createTransport(
+  sgTransport({ auth: { api_key: process.env.SANDGRID_KEY } })
+);
 
 import { signed, notSigned } from '../middlware/authCheck.js';
 import { User } from '../models/userModel.js';
+import emialSetUp from '../email/emailSetup.js';
 
 const authRouter = express.Router();
 
@@ -62,7 +72,9 @@ authRouter.post('/register', (req, res) => {
         cart: { items: [] },
       });
 
-      return newUser.save();
+      return mailer
+        .sendMail(emialSetUp(email), err => console.log(err))
+        .then(() => newUser.save());
     })
     .then(() => res.redirect('/auth/logIn#login'))
     .catch(err => {
