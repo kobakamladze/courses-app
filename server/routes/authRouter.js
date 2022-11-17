@@ -1,28 +1,27 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
-
-dotenv.config();
-
-import nodemailer from 'nodemailer';
-import sgTransport from 'nodemailer-sendgrid-transport';
-
-const mailer = nodemailer.createTransport(
-  sgTransport({ auth: { api_key: process.env.SANDGRID_KEY } })
-);
+import sgEmailer from '@sendgrid/mail';
+import randomToken from 'random-token';
 
 import { signed, notSigned } from '../middlware/authCheck.js';
 import { User } from '../models/userModel.js';
-import emialSetUp from '../email/emailSetup.js';
+import emailSetUp from '../email/registration.js';
+import resetEmailSetup from '../email/reset.js';
+
+dotenv.config();
+
+// Mail configuration
+sgEmailer.setApiKey(process.env.SENDGRID_API_KEY);
 
 const authRouter = express.Router();
 
-authRouter.get('/logIn', notSigned, (req, res) =>
-  res.render('auth/logIn', {
+authRouter.get('/logIn', notSigned, (req, res) => {
+  return res.render('auth/logIn', {
     logInError: req.flash('logInError'),
     registerError: req.flash('registerError'),
-  })
-);
+  });
+});
 
 authRouter.post('/logIn', notSigned, (req, res) => {
   const { email, password } = req.body;
@@ -56,6 +55,8 @@ authRouter.post('/logIn', notSigned, (req, res) => {
 authRouter.post('/register', (req, res) => {
   const { email, password, repeat } = req.body;
 
+  let newUserMail;
+
   return User.findOne({ email })
     .then(user => {
       if (user) {
@@ -72,18 +73,95 @@ authRouter.post('/register', (req, res) => {
         cart: { items: [] },
       });
 
-      return newUser.save().then(() => {
-        const emailOptions = emialSetUp(email);
-        return mailer.sendMail(emailOptions, err => console.log(err));
-      });
+      newUserMail = email;
+
+      return newUser.save();
+    })
+    .then(() => {
+      const emailOptions = emailSetUp(newUserMail);
+      return sgEmailer.send(emailOptions);
     })
     .then(() => res.redirect('/auth/logIn#login'))
     .catch(err => {
-      console.log(JSON.stringify(err));
       res.render('error', err);
     })
     .finally();
 });
+
+authRouter.get('/reset', notSigned, (req, res) =>
+  res.render('auth/reset', { error: req.flash('error') })
+);
+
+authRouter.post('/sendResetMail', notSigned, (req, res) => {
+  const { email } = req.body;
+
+  let userEmail;
+  let userToken;
+
+  return User.findOne({ email })
+    .then(candidate => {
+      if (!candidate) {
+        req.flash('error', 'User with such Email could not be found.');
+        return res.redirect('/auth/reset');
+      }
+
+      candidate.resetToken = randomToken(16);
+      candidate.resetTokenExp = Date.now() + 10 * 60 * 1000;
+
+      userEmail = email;
+      userToken = candidate.resetToken;
+
+      return candidate.save();
+    })
+    .then(() => {
+      const emailOptions = resetEmailSetup({
+        email: userEmail,
+        resetToken: userToken,
+      });
+
+      return sgEmailer.send(emailOptions);
+    })
+    .then(() => res.redirect('/auth/logIn#login'))
+    .catch(err => console.log(err))
+    .finally();
+});
+
+authRouter.get('/passwordChange/:token', notSigned, (req, res) => {
+  const token = req.params.token;
+
+  return User.findOne({ resetToken: token }).then(candidate => {
+    if (candidate.resetTokenExp < Date.now()) {
+      return res.render('error', { err: 'Token expired' });
+    }
+
+    return res.render('auth/passwordChange', {
+      resetToken: token,
+      resetTokenExp: candidate.resetTokenExp,
+      userId: candidate._id,
+    });
+  });
+});
+
+authRouter.post('/passwordChange/:token', (req, res) =>
+  User.findOne({ _id: req.body.userId, resetToken: req.body.resetToken })
+    .then(candidate => {
+      if (
+        candidate.resetTokenExp < Date.now() ||
+        candidate.resetToken !== req.body.resetToken
+      ) {
+        return res.render('error', {
+          err: 'Token expired or something went wrong',
+        });
+      }
+
+      candidate.password = bcrypt.hashSync(`${req.body.password}`, 10);
+      candidate.resetTokenExp = undefined;
+      candidate.resetToken = undefined;
+
+      return candidate.save();
+    })
+    .then(() => res.redirect('/'))
+);
 
 authRouter.get('/logOut', signed, (req, res) => {
   req.session.destroy(() => res.redirect('/'));

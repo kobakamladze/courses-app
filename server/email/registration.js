@@ -1,6 +1,6 @@
-function emialSetUp(to) {
+function emailSetUp(email) {
   return {
-    to,
+    to: email,
     from: 'expressCoursesApp@gmail.com',
     subject: 'Account Created!',
     text: 'SOME TEEXTTTTTTTTTTTT!!!!!!!!!!!!!',
@@ -8,4 +8,4 @@ function emialSetUp(to) {
   };
 }
 
-export default emialSetUp;
+export default emailSetUp;
