@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import sgEmailer from '@sendgrid/mail';
 import randomToken from 'random-token';
 
+import Joi from 'joi';
+
 import { signed, notSigned } from '../middlware/authCheck.js';
 import { User } from '../models/userModel.js';
 import emailSetUp from '../email/registration.js';
@@ -13,6 +15,21 @@ dotenv.config();
 
 // Mail configuration
 sgEmailer.setApiKey(process.env.SENDGRID_API_KEY);
+
+const userSchema = {
+  reguster: Joi.object({
+    email: Joi.string().email().required(),
+    password: Joi.string()
+      .min(6)
+      .max(18)
+      // .regex(/^[a-z][a-z0-9]*$/i)
+      .required(),
+    confirm: Joi.any()
+      .valid(Joi.ref('password'))
+      .messages({ 'any.only': 'Passwords does not match' })
+      .required(),
+  }),
+};
 
 const authRouter = express.Router();
 
@@ -53,10 +70,15 @@ authRouter.post('/logIn', notSigned, (req, res) => {
 });
 
 authRouter.post('/register', (req, res) => {
-  const { email, password, repeat } = req.body;
+  const { email, password, confirm } = req.body;
+
+  const validate = userSchema.reguster.validate({ email, password, confirm });
+  if (validate.error) {
+    req.flash('registerError', validate.error.details[0].message);
+    return res.redirect('/auth/login');
+  }
 
   let newUserMail;
-
   return User.findOne({ email })
     .then(user => {
       if (user) {
